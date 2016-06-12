@@ -9,7 +9,9 @@ class TidesSpider(scrapy.Spider):
 
   def parse(self, response):
     for region in response.xpath('//option'):
-      print region
+      value = region.xpath('@value').extract()
+      name = region.xpath('text()').extract()
+      print value, name
 
 # first level (region): select#mapSelect > option = http://tides.gc.ca/eng/find/region?id=5
 # second level (zone): select#mapSelect > option = http://tides.gc.ca/eng/find/zone?id=22
