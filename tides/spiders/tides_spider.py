@@ -23,6 +23,11 @@ class TidesSpider(scrapy.Spider):
       name = zone.xpath('text()').extract()[0]
       url = "http://tides.gc.ca/eng/station?sid=%s" % value
       print value, name, url
+      yield scrapy.Request(url, callback=self.parse_final_level)
+
+  def parse_final_level(self, response):
+    for station in response.xpath('//table'):
+      print station
 
 # third level: select#mapSelect > option = http://tides.gc.ca/eng/station?sid=1485
 # fourth level: table
