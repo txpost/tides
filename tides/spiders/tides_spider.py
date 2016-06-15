@@ -19,9 +19,10 @@ class TidesSpider(scrapy.Spider):
   # second level (zone): select#mapSelect > option = http://tides.gc.ca/eng/find/zone?id=22
   def parse_second_level(self, response):
     for zone in response.xpath('//option'):
-      print zone
-    
-
+      value = zone.xpath('@value').extract()[0]
+      name = zone.xpath('text()').extract()[0]
+      url = "http://tides.gc.ca/eng/station?sid=%s" % value
+      print value, name, url
 
 # third level: select#mapSelect > option = http://tides.gc.ca/eng/station?sid=1485
 # fourth level: table
