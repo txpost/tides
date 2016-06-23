@@ -12,9 +12,13 @@ class TidesSpider(scrapy.Spider):
     for table in response.xpath('//div[@class="grid-12 indent-medium"]/div/table'):
       date = table.xpath('@title').extract()[0][-10:]
       date = date.replace('-', '')
-      print date
-      for tide in table.xpath('.//tbody/tr/td'):
-        print tide
+      for row in table.xpath('.//tbody/tr'):
+        time = row.xpath('td/text()').extract()[0]
+        heightMeters = row.xpath('td/text()').extract()[1]
+        heightFeet = row.xpath('td/text()').extract()[2]
+        tide = 1
+        if float(heightMeters) < 1:
+          tide = 0
   
   # region
   # select#mapSelect > option 
