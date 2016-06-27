@@ -1,5 +1,7 @@
 import scrapy
 
+from tides.items import TidesItem
+
 class TidesSpider(scrapy.Spider):
   name = "tides"
   allowed_domains = ["tides.gc.ca"]
@@ -14,11 +16,18 @@ class TidesSpider(scrapy.Spider):
       date = date.replace('-', '')
       for row in table.xpath('.//tbody/tr'):
         time = row.xpath('td/text()').extract()[0]
-        heightMeters = row.xpath('td/text()').extract()[1]
-        heightFeet = row.xpath('td/text()').extract()[2]
+        height_meters = row.xpath('td/text()').extract()[1]
+        height_feet = row.xpath('td/text()').extract()[2]
         tide = 1
-        if float(heightMeters) < 1:
+        if float(height_meters) < 1:
           tide = 0
+        item = TidesItem()
+        item['date'] = date
+        item['time'] = time
+        item['height_meters'] = height_meters
+        item['height_feet'] = height_feet
+        item['tide'] = tide
+        yield item
   
   # region
   # select#mapSelect > option 
