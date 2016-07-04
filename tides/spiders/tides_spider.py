@@ -7,27 +7,28 @@ class TidesSpider(scrapy.Spider):
   allowed_domains = ["tides.gc.ca"]
   start_urls = [
     # 'http://tides.gc.ca/eng/'
-    'http://tides.gc.ca/eng/station?sid=1485'
+    # 'http://tides.gc.ca/eng/station?sid=1485'
+    'http://tides.gc.ca/eng/station?type=0&date=2016%2F01%2F01&sid=6457&tz=UTC&pres=2'
   ]
 
   def parse(self, response):
-    for table in response.xpath('//div[@class="grid-12 indent-medium"]/div/table'):
-      date = table.xpath('@title').extract()[0][-10:]
-      date = date.replace('-', '')
-      for row in table.xpath('.//tbody/tr'):
-        time = row.xpath('td/text()').extract()[0]
-        height_meters = row.xpath('td/text()').extract()[1]
-        height_feet = row.xpath('td/text()').extract()[2]
-        tide = 1
-        if float(height_meters) < 1:
-          tide = 0
-        item = TidesItem()
-        item['date'] = date
-        item['time'] = time
-        item['height_meters'] = height_meters
-        item['height_feet'] = height_feet
-        item['tide'] = tide
-        yield item
+    for div in response.xpath('//div[@class="stationTextData"]/div'):
+      tides_string = div.xpath('text()').extract()[0].strip()
+      tides_split = tides_string.split(';')
+      date = tides_split[0]
+      date = date.replace('/', '')
+      time = tides_split[1]
+      time = time.replace(':', '')
+      height_meters = tides_split[2]
+      height_meters = height_meters.replace('(m)', '')
+      height_feet = tides_split[3]
+      height_feet = height_feet.replace('(ft)', '')
+      item = TidesItem()
+      item['date'] = date
+      item['time'] = time
+      item['height_meters'] = height_meters
+      item['height_feet'] = height_feet
+      yield item
   
   # region
   # select#mapSelect > option 
