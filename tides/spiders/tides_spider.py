@@ -6,23 +6,25 @@ class TidesSpider(scrapy.Spider):
   name = "tides"
   allowed_domains = ["tides.gc.ca"]
   start_urls = [
-    # 'http://tides.gc.ca/eng/'
-    'http://tides.gc.ca/eng/find/zone?id=22'
-    # 'http://tides.gc.ca/eng/station?type=0&date=2015%2F1%2F1&sid=1485&tz=UTC&pres=2'
+    'http://tides.gc.ca/eng/'
   ]
   
   # region
   # select#mapSelect > option 
   # http://tides.gc.ca/eng/find/region?id=5
-  # def parse(self, response):
-  #   for region in response.xpath('//option'):
-  #     value = region.xpath('@value').extract()[0]
-  #     name = region.xpath('text()').extract()[0]
-  #     url = "http://tides.gc.ca/eng/find/zone?id=%s" % value
-  #     print value, name, url
-  #     yield scrapy.Request(url, callback=self.parse_second_level)
-
   def parse(self, response):
+    for region in response.xpath('//option'):
+      value = region.xpath('@value').extract()[0]
+      name = region.xpath('text()').extract()[0]
+      url = "http://tides.gc.ca/eng/find/zone?id=%s" % value
+      # print value, name, url
+      yield scrapy.Request(url, callback=self.parse_second_level)
+
+  # zone 
+  # select#mapSelect > option 
+  # http://tides.gc.ca/eng/find/zone?id=22
+  def parse_second_level(self, response):
+    # 7 day increments
     start_dates = [
       [1,1],[1,8],[1,15],[1,22],[1, 29],
       [2,5],[2,12],[2,19],[2,26],
@@ -38,39 +40,17 @@ class TidesSpider(scrapy.Spider):
       [12,3],[12,10],[12,17],[12,24],[12,31]
     ]
 
-    # for zone in response.xpath('//option'):
-    #   value = zone.xpath('@value').extract()[0]
-    #   name = zone.xpath('text()').extract()[0]
-    #   url = "http://tides.gc.ca/eng/station?sid=%s" % value
-    #   print value, name, url
-      # yield scrapy.Request(url, callback=self.parse_final_level)
-    
-    for date in start_dates:
-      month = str(date[0])
-      day = str(date[1])
-      sid = '1485'
-      url = "http://tides.gc.ca/eng/station?type=0&date=2015%%2F%s%%2F%s&sid=%s&tz=UTC&pres=2" % (month, day, sid)
-      yield scrapy.Request(url, callback=self.parse_final_level)
-  
-  # zone 
-  # select#mapSelect > option 
-  # http://tides.gc.ca/eng/find/zone?id=22
-  # def parse_second_level(self, response):
-  #   for zone in response.xpath('//option'):
-  #     value = zone.xpath('@value').extract()[0]
-  #     name = zone.xpath('text()').extract()[0]
-  #     url = "http://tides.gc.ca/eng/station?sid=%s" % value
-  #     print value, name, url
-  #     yield scrapy.Request(url, callback=self.parse_final_level)
+    for zone in response.xpath('//option'):
+      sid = zone.xpath('@value').extract()[0]
+      for date in start_dates:
+        month = str(date[0])
+        day = str(date[1])
+        url = "http://tides.gc.ca/eng/station?type=0&date=2015%%2F%s%%2F%s&sid=%s&tz=UTC&pres=2" % (month, day, sid)
+        yield scrapy.Request(url, callback=self.parse_final_level)
 
   # sid
   # table
   # http://tides.gc.ca/eng/station?sid=1485
-  # def parse_final_level(self, response):
-  #   for station in response.xpath('//table'):
-  #     title = station.
-  #     print station
-
   def parse_final_level(self, response):
     for div in response.xpath('//div[@class="stationTextData"]/div'):
       tides_string = div.xpath('text()').extract()[0].strip()
