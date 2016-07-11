@@ -12,5 +12,4 @@ class TidesItem(scrapy.Item):
   time = scrapy.Field()
   height_meters = scrapy.Field()
   height_feet = scrapy.Field()
-  # sid = scrapy.Field()
-  # tz = scrapy.Field()
+  sid = scrapy.Field()
