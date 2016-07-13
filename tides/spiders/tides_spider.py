@@ -53,10 +53,10 @@ class TidesSpider(scrapy.Spider):
   # table
   # http://tides.gc.ca/eng/station?type=0&date=2015%2F01%2F01&sid=1485&tz=UTC&pres=2
   def parse_final_level(self, response):
-    # sid = response.xpath('//div[@class="stationTextHeader"]/div/text()').extract()[0]
-    # p = re.compile('\(\d*\)')
-    # sid = p.search(sid).string()
-    # print sid
+    sid_full = response.xpath('//div[@class="stationTextHeader"]/div/text()').extract()[0]
+    p = re.compile('\(\d*\)')
+    sid = re.search(p, sid_full).group(0)
+    sid = sid.strip('()')
     for div in response.xpath('//div[@class="stationTextData"]/div'):
       tides_string = div.xpath('text()').extract()[0].strip()
       tides_split = tides_string.split(';')
@@ -73,4 +73,5 @@ class TidesSpider(scrapy.Spider):
       item['time'] = time
       item['height_meters'] = height_meters
       item['height_feet'] = height_feet
+      item['sid'] = sid
       yield item
