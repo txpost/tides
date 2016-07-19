@@ -10,10 +10,8 @@
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 
 BOT_NAME = 'tides'
-
 SPIDER_MODULES = ['tides.spiders']
 NEWSPIDER_MODULE = 'tides.spiders'
-
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'tides (+http://www.yourdomain.com)'
@@ -64,9 +62,9 @@ ROBOTSTXT_OBEY = True
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'tides.pipelines.SomePipeline': 300,
-#}
+ITEM_PIPELINES = {
+   'tides.pipelines.TidesPipeline': 300
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
